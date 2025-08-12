@@ -1,0 +1,87 @@
+# train_config.yaml
+
+# Paths and Locations
+paths:
+  # Path to the base model checkpoint directory, which should contain the model.pt and config.yaml files
+  base_model_path: "path/to/your/base_model"
+  # Path to the pretrained audio tokenizer checkpoint DIRECTORY
+  audio_tokenizer_path: "path/to/your/audio_tokenizer"
+  # Path to the pretrained separate audio tokenizer checkpoint DIRECTORY (for vocal/bgm separation)
+  separate_audio_tokenizer_path: "path/to/your/separate_audio_tokenizer"
+  # Directory containing the raw .wav files for training
+  raw_data_dir: "path/to/your/wav_files"
+  # Path to the metadata file (.jsonl) corresponding to the raw_data_dir
+  metadata_path: "path/to/your/metadata.jsonl"
+  # Directory where the prepared data for training will be saved
+  prepared_data_dir: "path/to/your/prepared_data"
+  # Directory where the training outputs (checkpoints, logs) will be saved
+  output_dir: "path/to/your/training_output"
+
+# Data Preparation Settings
+data:
+  # The sample rate of the input audio files. Should match the model's expected sample rate.
+  sample_rate: 44100
+  # The maximum duration of audio clips in seconds. Longer clips will be truncated.
+  max_duration_secs: 30
+  # Number of worker processes for data preparation.
+  num_workers: 4
+
+# Training Settings
+training:
+  # Type of training to perform: 'full' for full finetuning, 'lora' for LoRA finetuning.
+  type: 'full' # 'full' or 'lora'
+  # Total number of training epochs.
+  epochs: 10
+  # Batch size for training.
+  batch_size: 4
+  # Batch size for validation.
+  validation_batch_size: 4
+  # Learning rate for the optimizer.
+  learning_rate: 1.0e-5
+  # Weight decay for the optimizer.
+  weight_decay: 0.1
+  # Adam optimizer's beta1 parameter.
+  adam_beta1: 0.9
+  # Adam optimizer's beta2 parameter.
+  adam_beta2: 0.95
+  # Number of warmup steps for the learning rate scheduler.
+  warmup_steps: 100
+  # Interval (in steps) for logging training progress.
+  log_interval: 10
+  # Interval (in epochs) for saving model checkpoints.
+  save_interval: 1
+  # Gradient accumulation steps to simulate a larger batch size.
+  gradient_accumulation_steps: 8
+  # Whether to use mixed precision training (float16).
+  use_fp16: True
+  # Seed for reproducibility.
+  seed: 42
+
+# LoRA (Low-Rank Adaptation) Settings
+# These settings are only used if training.type is 'lora'.
+lora:
+  # The rank of the LoRA matrices.
+  r: 8
+  # The alpha parameter for LoRA scaling.
+  alpha: 16
+  # Dropout probability for LoRA layers.
+  dropout: 0.05
+  # List of modules to apply LoRA to. E.g., ["q_proj", "v_proj"] for attention projections.
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+    - "k_proj"
+    - "o_proj"
+
+# Model Architecture Settings (usually inherited from the base model's config.yaml, but can be overridden here)
+model:
+  # The dimension of the model.
+  dim: 1536
+  # The number of attention heads.
+  num_heads: 24
+  # The number of transformer layers.
+  num_layers: 24
+  # Intermediate size in the feed-forward network.
+  intermediate_size: 6144
+  # Whether to use flash attention.
+  use_flash_attn_2: True
